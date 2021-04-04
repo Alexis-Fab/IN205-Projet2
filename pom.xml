@@ -97,7 +97,7 @@
   <artifactId>exec-maven-plugin</artifactId>
   <version>1.4.0</version>
   <configuration>
-    <mainClass>com.ensta.librarymanager.utils.FillDatabase</mainClass>
+    <mainClass>com.ensta.librarymanager.test.ModeleTest</mainClass>
   </configuration>
 </plugin>
 <plugin>
