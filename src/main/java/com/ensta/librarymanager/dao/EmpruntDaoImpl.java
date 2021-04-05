@@ -14,14 +14,14 @@ import java.util.List;
 import java.time.LocalDate;
 
 import com.ensta.librarymanager.exception.DaoException;
-import com.ensta.librarymanager.modele.Emprunt;
-import com.ensta.librarymanager.modele.utils.*;
+import com.ensta.librarymanager.modele.*;
+import com.ensta.librarymanager.utils.*;
 import com.ensta.librarymanager.dao.EmpruntDao;
 
 
 public class EmpruntDaoImpl implements EmpruntDao {
 	private static EmpruntDaoImpl instance;
-	private EmpruntDaoImpl() {}
+	private EmpruntDaoImpl() {};
 	public static EmpruntDao getInstance() {
 		if(instance == null) {
 			instance = new EmpruntDaoImpl();
@@ -139,7 +139,6 @@ public class EmpruntDaoImpl implements EmpruntDao {
 
 
 	public void create(int idMembre, int idLivre, LocalDate dateEmprunt) throws DaoException {
-    Emprunt newEmprunt = new Emprunt(idMembre, idLivre, dateEmprunt);
 		int id = -1;
 		try {
 			connection = ConnectionManager.getConnection();
@@ -150,7 +149,7 @@ public class EmpruntDaoImpl implements EmpruntDao {
 			preparedStatement.executeUpdate();
 		}
 		catch (SQLException e) {
-			throw new DaoException("Failed to CREATE the new loan : " + newEmprunt, e);
+			throw new DaoException("CREATE a new loan failed", e);
 		}
 	};
 
@@ -186,12 +185,12 @@ public class EmpruntDaoImpl implements EmpruntDao {
 			preparedStatement = connection.prepareStatement(COUNT);
 			ResultSet res = preparedStatement.executeQuery();
 			if(res.next()) {
-				count = res.getInt("count");
+				counter = res.getInt("count");
 			}
 		}
 		catch (SQLException e) {
 			throw new DaoException("COUNT in EmpruntDao failed", e);
 		}
-		return count;
+		return counter;
 	};
 }
