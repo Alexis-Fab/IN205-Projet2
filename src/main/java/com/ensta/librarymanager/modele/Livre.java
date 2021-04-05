@@ -31,6 +31,9 @@ public class Livre{
       this.isbn = isbn;
   }
 
+public Livre() {
+  id=-1; author=""; title=""; isbn="";
+}
 
   public Livre(int id, String author, String title, String isbn) {
     this.id=id; this.author=author; this.title=title; this.isbn=isbn;

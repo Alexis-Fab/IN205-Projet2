@@ -18,7 +18,7 @@ public class Emprunt{
   public Livre getBook() {
       return book;
   }
-  public void setBook(Integer book) {
+  public void setBook(Livre book) {
       this.book = book;
   }
   public Membre getMember() {
@@ -40,6 +40,9 @@ public class Emprunt{
       this.returnDate = returnDate;
   }
 
+  public Emprunt() {
+    id=-1; member = new Membre(); book = new Livre();
+  }
 
   public Emprunt(int id, Membre member, Livre book, LocalDate borrowDate, LocalDate returnDate) {
     this.id=id; this.member=member; this.book=book; this.borrowDate=borrowDate; this.returnDate=returnDate;

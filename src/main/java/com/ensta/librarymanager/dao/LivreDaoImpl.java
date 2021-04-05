@@ -12,6 +12,7 @@ import com.ensta.librarymanager.dao.LivreDao;
 import com.ensta.librarymanager.exception.DaoException;
 import com.ensta.librarymanager.modele.*;
 import com.ensta.librarymanager.utils.*;
+import com.ensta.librarymanager.persistence.ConnectionManager;
 
 public class LivreDaoImpl implements LivreDao {
 	private static LivreDaoImpl instance;
@@ -31,9 +32,9 @@ public class LivreDaoImpl implements LivreDao {
 	private static final String COUNT = "SELECT COUNT(id) AS count FROM livre";
 
 
-	public List<Livre> getList() throws DaoException;
+	public List<Livre> getList() throws DaoException {
 		List<Livre> livres = new ArrayList<>();
-		try (Connection connection = EstablishConnection.getConnection();
+		try (Connection connection = ConnectionManager.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ALL);
 			ResultSet res = preparedStatement.executeQuery(); )
 			{
@@ -49,11 +50,11 @@ public class LivreDaoImpl implements LivreDao {
 	};
 
 
-	public Livre getById(int id) throws DaoException;
+	public Livre getById(int id) throws DaoException {
 		Livre book = new Livre();
 		try {
 			Connection connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(SELECT_ONE_BY_ID);
+			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ONE_BY_ID);
 			preparedStatement.setInt(1, id);
 			ResultSet res = preparedStatement.executeQuery();
 			if (res.next()) {
@@ -74,7 +75,7 @@ public class LivreDaoImpl implements LivreDao {
 		int id = -1;
 		try {
 			Connection connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(CREATE, Statement.RETURN_GENERATED_KEYS);
+			PreparedStatement preparedStatement = connection.prepareStatement(CREATE, Statement.RETURN_GENERATED_KEYS);
 			preparedStatement.setString(1, titre);
 			preparedStatement.setString(2, auteur);
 			preparedStatement.setString(3, isbn);
@@ -94,7 +95,7 @@ public class LivreDaoImpl implements LivreDao {
 	public void update(Livre livre) throws DaoException {
 		try {
 			Connection connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(UPDATE);
+			PreparedStatement preparedStatement = connection.prepareStatement(UPDATE);
 			preparedStatement.setString(1, livre.getTitle());
 			preparedStatement.setString(2, livre.getAuthor());
 			preparedStatement.setString(3, livre.getIsbn());
@@ -110,7 +111,7 @@ public class LivreDaoImpl implements LivreDao {
 	public void delete(int id) throws DaoException {
 		try {
 			Connection connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(DELETE);
+			PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
 			preparedStatement.setInt(1, id);
 			preparedStatement.executeUpdate();
 		}
@@ -121,11 +122,13 @@ public class LivreDaoImpl implements LivreDao {
 
 
 	public int count() throws DaoException {
-		try ( Connection connection = ConnectionManager.getConnection();
+		int counter = 0;
+		try (
+					Connection connection = ConnectionManager.getConnection();
 					PreparedStatement preparedStatement = connection.prepareStatement(COUNT);
 					ResultSet res = preparedStatement.executeQuery(); )
 		{
-		int counter = res.getInt(1);
+		counter = res.getInt(1);
 		}
 		catch (SQLException e) {
 			throw new DaoException("COUNT in LivreDao failed", e);

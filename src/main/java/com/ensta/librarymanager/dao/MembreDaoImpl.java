@@ -9,9 +9,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.ensta.librarymanager.dao.MembreDaoImpl;
-import com.ensta.librarymanager.model.*;
+import com.ensta.librarymanager.modele.*;
 import com.ensta.librarymanager.utils.*;
 import com.ensta.librarymanager.exception.DaoException;
+import com.ensta.librarymanager.persistence.ConnectionManager;
+
 
 public class MembreDaoImpl implements MembreDao {
 	private static MembreDao instance;
@@ -38,7 +40,9 @@ public class MembreDaoImpl implements MembreDao {
 			 ResultSet res = preparedStatement.executeQuery(); )
 			{
 			while(res.next()) {
-				Membre member = new Membre(res.getInt("id"), res.getString("nom"), res.getString("prenom"), res.getString("adresse"), res.getString("email"), res.getString("telephone"));
+				Membre member = new Membre(res.getInt("id"), res.getString("nom"), res.getString("prenom"),
+																	res.getString("adresse"), res.getString("email"), res.getString("telephone"),
+																	Abonnement.valueOf(res.getString("abonnement")));
 				membres.add(member);
 			}
 		}
@@ -52,8 +56,8 @@ public class MembreDaoImpl implements MembreDao {
 	public Membre getById(int id) throws DaoException {
 		Membre member = new Membre();
 		try {
-			connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(SELECT_ONE_BY_ID);
+			Connection connection = ConnectionManager.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(SELECT_ONE_BY_ID);
 			preparedStatement.setInt(1, id);
 			ResultSet res = preparedStatement.executeQuery();
 			if(res.next()) {
@@ -69,26 +73,28 @@ public class MembreDaoImpl implements MembreDao {
 		catch (SQLException e) {
 			throw new DaoException("SELECT BY ID in MembreDao failed with id : " + id, e);
 		}
-		return membre;
+		return member;
 	};
 
 
 	public int create(String nom, String prenom, String adresse, String email, String telephone) throws DaoException {
 		int id = -1;
+		Membre member = new Membre(id, nom,prenom,adresse,email,telephone, Abonnement.BASIC);
 		try {
 			Connection connection = ConnectionManager.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(CREATE, Statement.RETURN_GENERATED_KEYS);
-			preparedStatement.setString(1, membre.getSurname());
-			preparedStatement.setString(2, membre.getForename());
-			preparedStatement.setString(3, membre.getAdress());
-			preparedStatement.setString(4, membre.getMail());
-			preparedStatement.setString(5, membre.getPhone());
+			preparedStatement.setString(1, member.getSurname());
+			preparedStatement.setString(2, member.getForename());
+			preparedStatement.setString(3, member.getAdress());
+			preparedStatement.setString(4, member.getMail());
+			preparedStatement.setString(5, member.getPhone());
 			preparedStatement.setString(6, Abonnement.BASIC.toString());
 			preparedStatement.executeUpdate();
-			ResultSet res preparedStatement.getGeneratedKeys();
+			ResultSet res = preparedStatement.getGeneratedKeys();
 			if (res.next()) {
 				id = res.getInt(1);
-			}
+				member.setId(id);
+			};
 		}
 		catch (SQLException e) {
 			throw new DaoException("CREATE a new member failed", e);
@@ -119,8 +125,8 @@ public class MembreDaoImpl implements MembreDao {
 
 	public void delete(int id) throws DaoException {
 		try {
-			connection = ConnectionManager.getConnection();
-			preparedStatement = connection.prepareStatement(DELETE);
+			Connection connection = ConnectionManager.getConnection();
+			PreparedStatement preparedStatement = connection.prepareStatement(DELETE);
 			preparedStatement.setInt(1, id);
 			preparedStatement.executeUpdate();
 		}
@@ -130,12 +136,13 @@ public class MembreDaoImpl implements MembreDao {
 	};
 
 	public int count() throws DaoException {
+		int counter = 0;
 		try (
 			Connection connection = ConnectionManager.getConnection();
 			PreparedStatement preparedStatement = connection.prepareStatement(COUNT);
 			ResultSet res = preparedStatement.executeQuery(); )
 			{
-		int counter = res.getInt(1);
+		counter = res.getInt(1);
 		}
 		catch (SQLException e) {
 			throw new DaoException("COUNT in MembreDao failed", e);

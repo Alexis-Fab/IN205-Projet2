@@ -1,11 +1,9 @@
 package com.ensta.librarymanager.modele;
 
+import com.ensta.librarymanager.modele.Abonnement;
+
 public class Membre {
-  public enum Abonnement {
-    BASIC,
-    PREMIUM,
-    VIP,
-  };
+
   private int id;
   private String forename;
   private String surname;
@@ -58,13 +56,14 @@ public class Membre {
     return subscription;
   }
 
+  public Membre() {
+    id=-1; forename=""; surname=""; adress=""; mail=""; phone=""; subscription=Abonnement.BASIC;
+  }
+
   public Membre(int myId, String myForename, String mySurname, String myAdress, String myMail, String myPhone, Abonnement mySubscription) {
     id=myId; forename=myForename; surname=mySurname; adress=myAdress; mail=myMail; phone=myPhone; subscription=mySubscription;
   }
 
-  public String toString() {
-    return( forename + " " + surname);
-  }
   public String toString() {
 		return ("{"	+ "forename:" + forename + ", "
 				        + "surname: " + surname + ", "
